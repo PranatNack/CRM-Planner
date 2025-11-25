@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แดชบอร์ด - BIGIT CRM</title>
+  <link rel="icon" type="image/png" href="https://crm.bigitcorp.co.th/images/logo-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Header -->
+    <header class="header"></header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        <!-- Page Header -->
+        <div style="margin-bottom: var(--spacing-xl);">
+          <h1>แดชบอร์ด</h1>
+          <p class="text-muted">ภาพรวมของระบบจัดการงานและโปรเจกต์</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div style="display: flex; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); flex-wrap: wrap;">
+          <a href="tasks.html" class="btn btn-primary">
+            ➕ สร้างงานใหม่
+          </a>
+          <a href="projects.html" class="btn btn-secondary">
+            📁 สร้างโปรเจกต์ใหม่
+          </a>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <!-- Recent Activities & Upcoming Reminders -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: var(--spacing-xl); margin-top: var(--spacing-xl);">
+          <!-- Recent Activities -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">📜 กิจกรรมล่าสุด</h3>
+              <a href="logs.html" class="btn btn-sm btn-outline">ดูทั้งหมด</a>
+            </div>
+            <div class="card-body">
+              <div id="recentActivities"></div>
+            </div>
+          </div>
+
+          <!-- Upcoming Tasks -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">📅 งานที่กำลังจะถึงกำหนด</h3>
+              <a href="tasks.html" class="btn btn-sm btn-outline">ดูทั้งหมด</a>
+            </div>
+            <div class="card-body">
+              <div id="upcomingTasks"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/tasks.js"></script>
+  <script src="assets/js/projects.js"></script>
+  <script>
+    // Render Dashboard
+    function renderDashboard() {
+      renderStats();
+      renderRecentActivities();
+      renderUpcomingTasks();
+    }
+
+    function renderStats() {
+      const tasks = getTasks();
+      const projects = getProjects();
+      const notifications = getNotifications();
+
+      const todoCount = tasks.filter(t => t.status === 'todo').length;
+      const inProgressCount = tasks.filter(t => t.status === 'inprogress').length;
+      const doneCount = tasks.filter(t => t.status === 'done').length;
+      const unreadNotifs = notifications.filter(n => !n.read && !n.deleted).length;
+
+      const statsGrid = document.getElementById('statsGrid');
+      statsGrid.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-icon" style="background: var(--color-primary-light); color: var(--color-primary);">
+            📁
+          </div>
+          <div class="stat-content">
+            <div class="stat-label">โปรเจกต์ทั้งหมด</div>
+            <div class="stat-value">${projects.length}</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon" style="background: var(--color-todo-light); color: var(--color-todo);">
+            📋
+          </div>
+          <div class="stat-content">
+            <div class="stat-label">งานที่ต้องทำ</div>
+            <div class="stat-value">${todoCount}</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon" style="background: var(--color-inprogress-light); color: var(--color-inprogress);">
+            ⚡
+          </div>
+          <div class="stat-content">
+            <div class="stat-label">งานที่กำลังทำ</div>
+            <div class="stat-value">${inProgressCount}</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon" style="background: var(--color-done-light); color: var(--color-done);">
+            ✅
+          </div>
+          <div class="stat-content">
+            <div class="stat-label">งานที่เสร็จแล้ว</div>
+            <div class="stat-value">${doneCount}</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon" style="background: var(--color-danger-light); color: var(--color-danger);">
+            🔔
+          </div>
+          <div class="stat-content">
+            <div class="stat-label">การแจ้งเตือนใหม่</div>
+            <div class="stat-value">${unreadNotifs}</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon" style="background: #fef3c7; color: var(--color-warning);">
+            📊
+          </div>
+          <div class="stat-content">
+            <div class="stat-label">งานทั้งหมด</div>
+            <div class="stat-value">${tasks.length}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRecentActivities() {
+      const logs = getLogs();
+      const recentLogs = logs.slice(0, 5);
+
+      const container = document.getElementById('recentActivities');
+
+      if (recentLogs.length === 0) {
+        container.innerHTML = '<p class="text-muted text-center">ไม่มีกิจกรรมล่าสุด</p>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="timeline">
+          ${recentLogs.map(log => {
+            const typeIcons = {
+              auth: '🔐',
+              task: '📋',
+              project: '📁',
+              comment: '💬',
+              checklist: '☑️',
+              notification: '🔔',
+              settings: '⚙️'
+            };
+            
+            return `
+              <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">
+                    ${typeIcons[log.type] || '📝'} ${log.action}
+                  </div>
+                  <div class="timeline-description">
+                    ${log.description}
+                  </div>
+                  <div class="timeline-time">
+                    ${formatRelativeTime(log.timestamp)}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderUpcomingTasks() {
+      const tasks = getTasks();
+      const now = new Date();
+      
+      // Get tasks with due dates in the next 7 days
+      const upcomingTasks = tasks
+        .filter(t => t.dueDate && t.status !== 'done')
+        .map(t => ({
+          ...t,
+          dueDateTime: new Date(t.dueDate)
+        }))
+        .filter(t => t.dueDateTime >= now)
+        .sort((a, b) => a.dueDateTime - b.dueDateTime)
+        .slice(0, 5);
+
+      const container = document.getElementById('upcomingTasks');
+
+      if (upcomingTasks.length === 0) {
+        container.innerHTML = '<p class="text-muted text-center">ไม่มีงานที่กำลังจะถึงกำหนด</p>';
+        return;
+      }
+
+      container.innerHTML = upcomingTasks.map(task => {
+        const project = task.projectId ? getProjectById(task.projectId) : null;
+        const daysUntilDue = Math.ceil((task.dueDateTime - now) / (1000 * 60 * 60 * 24));
+        
+        return `
+          <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--color-gray-100); cursor: pointer;" onclick="window.location.href='task-detail.html?id=${task.id}'">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-xs);">
+              <strong>${task.title}</strong>
+              <span class="badge badge-${task.status === 'todo' ? 'todo' : 'inprogress'}">
+                ${task.status === 'todo' ? 'ต้องทำ' : 'กำลังทำ'}
+              </span>
+            </div>
+            <div class="text-muted" style="font-size: 0.875rem;">
+              ${project ? `📁 ${project.name} • ` : ''}
+              📅 ${formatDate(task.dueDate)}
+              ${daysUntilDue <= 3 ? `<span style="color: var(--color-danger); font-weight: 600;"> (เหลือ ${daysUntilDue} วัน)</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Initialize dashboard
+    checkUpcomingTaskNotifications(); // Check and create notifications for upcoming tasks
+    renderDashboard();
+  </script>
+</body>
+</html>

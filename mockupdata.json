@@ -1,0 +1,166 @@
+{
+    "version": "1.0.0",
+    "exportedAt": "2025-11-25T14:44:00+07:00",
+    "description": "Thai Task & Project Management System - Mockup Data",
+    "users": [
+        {
+            "id": "user1",
+            "name": "แน็ก",
+            "email": "admin@example.com",
+            "password": "123456",
+            "role": "admin",
+            "avatar": "👨‍💼"
+        },
+        {
+            "id": "user2",
+            "name": "PGun",
+            "email": "user@example.com",
+            "password": "123456",
+            "role": "manager",
+            "avatar": "👔"
+        },
+        {
+            "id": "user3",
+            "name": "PBoat",
+            "email": "vichai@example.com",
+            "password": "123456",
+            "role": "user",
+            "avatar": "👨‍🎨"
+        },
+        {
+            "id": "user4",
+            "name": "PBon",
+            "email": "suda@example.com",
+            "password": "123456",
+            "role": "user",
+            "avatar": "👩‍🔧"
+        },
+        {
+            "id": "user5",
+            "name": "PAo",
+            "email": "PAo@example.com",
+            "password": "123456",
+            "role": "manager",
+            "avatar": "👔"
+        }
+    ],
+    "projects": [
+        {
+            "id": "proj1",
+            "name": "MA Backup VPN (Y69)",
+            "contractNumber": "",
+            "fiscalYear": "2569",
+            "projectStartDate": "2025-12-01",
+            "contractExpirationDate": "2026-09-30",
+            "status": "inprogress",
+            "manager": "user1",
+            "createdAt": "2025-12-01T09:00:00.000Z"
+        },
+        {
+            "id": "proj2",
+            "name": "MA Law (Y69)",
+            "contractNumber": "4/2569",
+            "fiscalYear": "2569",
+            "projectStartDate": "2025-10-01",
+            "contractExpirationDate": "2026-09-30",
+            "status": "inprogress",
+            "manager": "user2",
+            "createdAt": "2025-10-01T09:00:00.000Z"
+        },
+        {
+            "id": "proj3",
+            "name": "Monitoring",
+            "contractNumber": "103/2568",
+            "fiscalYear": "2568",
+            "projectStartDate": "2025-07-15",
+            "contractExpirationDate": "2026-05-10",
+            "status": "inprogress",
+            "manager": "user1",
+            "createdAt": "2025-07-15T09:00:00.000Z"
+        },
+        {
+            "id": "proj4",
+            "name": "MA Cyber Y68",
+            "contractNumber": "100/2568",
+            "fiscalYear": "2568",
+            "projectStartDate": "2025-06-01",
+            "contractExpirationDate": "2025-09-30",
+            "status": "inprogress",
+            "manager": "user1",
+            "createdAt": "2025-06-01T09:00:00.000Z"
+        },
+        {
+            "id": "proj5",
+            "name": "MA Opendata_Y68",
+            "contractNumber": "79/2568",
+            "fiscalYear": "2568",
+            "projectStartDate": "2025-02-01",
+            "contractExpirationDate": "2025-09-30",
+            "status": "inprogress",
+            "manager": "user3",
+            "createdAt": "2025-02-01T09:00:00.000Z"
+        },
+        {
+            "id": "proj6",
+            "name": "Ma Gisco_Y68",
+            "contractNumber": "73/2568",
+            "fiscalYear": "2568",
+            "projectStartDate": "2025-01-01",
+            "contractExpirationDate": "2025-09-30",
+            "status": "inprogress",
+            "manager": "user3",
+            "createdAt": "2025-01-01T09:00:00.000Z"
+        },
+        {
+            "id": "proj7",
+            "name": "Server VM",
+            "contractNumber": "101/2567",
+            "fiscalYear": "2568",
+            "projectStartDate": "2024-10-01",
+            "contractExpirationDate": "2025-02-27",
+            "status": "done",
+            "manager": "user1",
+            "createdAt": "2024-10-01T09:00:00.000Z"
+        },
+        {
+            "id": "proj8",
+            "name": "MA PTS_Y68",
+            "contractNumber": "48/2568",
+            "fiscalYear": "2568",
+            "projectStartDate": "2024-10-01",
+            "contractExpirationDate": "2025-09-30",
+            "status": "inprogress",
+            "manager": "user2",
+            "createdAt": "2024-10-01T09:00:00.000Z"
+        },
+        {
+            "id": "proj9",
+            "name": "MA Law_Y68",
+            "contractNumber": "17/2568",
+            "fiscalYear": "2568",
+            "projectStartDate": "2024-10-01",
+            "contractExpirationDate": "2025-09-30",
+            "status": "inprogress",
+            "manager": "user2",
+            "createdAt": "2024-10-01T09:00:00.000Z"
+        },
+        {
+            "id": "proj10",
+            "name": "Backup VPN",
+            "contractNumber": "70/2567",
+            "fiscalYear": "2567",
+            "projectStartDate": "2024-03-01",
+            "contractExpirationDate": "2024-10-26",
+            "status": "done",
+            "manager": "user1",
+            "createdAt": "2024-03-01T09:00:00.000Z"
+        }
+    ],
+    "tasks": [],
+    "notifications": [],
+    "logs": [],
+    "settings": {
+        "theme": "light",
+        "notifications": true
+    }
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ตั้งค่า - BIGIT CRM</title>
+  <link rel="icon" type="image/png" href="https://crm.bigitcorp.co.th/images/logo-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Header -->
+    <header class="header"></header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container" style="max-width: 800px;">
+        <!-- Page Header -->
+        <div style="margin-bottom: var(--spacing-xl);">
+          <h1>ตั้งค่า</h1>
+          <p class="text-muted">จัดการข้อมูลส่วนตัวและการตั้งค่าระบบ</p>
+        </div>
+
+        <!-- User Info Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h3 class="card-title">👤 ข้อมูลผู้ใช้</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">ชื่อ-นามสกุล</label>
+              <input type="text" class="form-control" id="settingName">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">อีเมล</label>
+              <input type="email" class="form-control" id="settingEmail">
+            </div>
+
+            <button class="btn btn-primary" onclick="saveUserInfo()">💾 บันทึกข้อมูล</button>
+          </div>
+        </div>
+
+        <!-- Theme Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h3 class="card-title">🎨 ธีม</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">โหมดการแสดงผล</label>
+              <select class="form-control" id="settingTheme" onchange="changeTheme()">
+                <option value="light">โหมดสว่าง</option>
+                <option value="dark">โหมดมืด</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">🔒 เปลี่ยนรหัสผ่าน</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">รหัสผ่านปัจจุบัน</label>
+              <input type="password" class="form-control" id="currentPassword" autocomplete="current-password">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">รหัสผ่านใหม่</label>
+              <input type="password" class="form-control" id="newPassword" autocomplete="new-password">
+              <small class="text-muted">รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร</small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ยืนยันรหัสผ่านใหม่</label>
+              <input type="password" class="form-control" id="confirmPassword" autocomplete="new-password">
+            </div>
+
+            <button class="btn btn-primary" onclick="changePassword()">🔑 เปลี่ยนรหัสผ่าน</button>
+          </div>
+        </div>
+
+        <!-- Data Management Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">💾 จัดการข้อมูล</h3>
+          </div>
+          <div class="card-body">
+            <p style="margin-bottom: var(--spacing-lg); color: var(--color-gray-600);">
+              จัดการข้อมูลทั้งหมดในระบบ รวมถึงการส่งออก นำเข้า และล้างข้อมูล
+            </p>
+
+            <div style="display: grid; gap: var(--spacing-md);">
+              <!-- Export All Data -->
+              <div style="padding: var(--spacing-md); background: var(--color-gray-50); border-radius: var(--radius-md);">
+                <h4 style="margin-bottom: var(--spacing-sm); font-size: 1rem;">📤 ส่งออกข้อมูลทั้งหมด</h4>
+                <p style="font-size: 0.875rem; color: var(--color-gray-600); margin-bottom: var(--spacing-md);">
+                  ส่งออกข้อมูลทั้งหมด (ผู้ใช้, งาน, โปรเจกต์, การแจ้งเตือน, บันทึก) เป็นไฟล์ JSON
+                </p>
+                <button class="btn btn-primary" onclick="exportAllData()">
+                  💾 ส่งออกข้อมูล
+                </button>
+              </div>
+
+              <!-- Import Data -->
+              <div style="padding: var(--spacing-md); background: var(--color-gray-50); border-radius: var(--radius-md);">
+                <h4 style="margin-bottom: var(--spacing-sm); font-size: 1rem;">📥 นำเข้าข้อมูล</h4>
+                <p style="font-size: 0.875rem; color: var(--color-gray-600); margin-bottom: var(--spacing-md);">
+                  นำเข้าข้อมูลจากไฟล์ JSON ที่ส่งออกไว้ก่อนหน้านี้ (ข้อมูลเดิมจะถูกแทนที่)
+                </p>
+                <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="handleImportFile(this)">
+                <button class="btn btn-primary" onclick="document.getElementById('importFileInput').click()">
+                  📂 เลือกไฟล์นำเข้า
+                </button>
+              </div>
+
+              <!-- Create Mockup Data -->
+              <div style="padding: var(--spacing-md); background: var(--color-gray-50); border-radius: var(--radius-md);">
+                <h4 style="margin-bottom: var(--spacing-sm); font-size: 1rem;">🎲 สร้างข้อมูลตัวอย่าง</h4>
+                <p style="font-size: 0.875rem; color: var(--color-gray-600); margin-bottom: var(--spacing-md);">
+                  สร้างข้อมูลตัวอย่างใหม่สำหรับทดสอบระบบ (ข้อมูลเดิมจะถูกแทนที่)
+                </p>
+                <button class="btn btn-secondary" onclick="createMockupData()">
+                  🎨 สร้างข้อมูลตัวอย่าง
+                </button>
+              </div>
+
+              <!-- Clear All Data -->
+              <div style="padding: var(--spacing-md); background: #fee2e2; border-radius: var(--radius-md); border: 1px solid #fecaca;">
+                <h4 style="margin-bottom: var(--spacing-sm); font-size: 1rem; color: var(--color-danger);">⚠️ ล้างข้อมูลทั้งหมด</h4>
+                <p style="font-size: 0.875rem; color: #991b1b; margin-bottom: var(--spacing-md);">
+                  <strong>ระวัง!</strong> การกระทำนี้จะลบข้อมูลทั้งหมดและไม่สามารถย้อนกลับได้ กรุณาส่งออกข้อมูลก่อนหากต้องการเก็บไว้
+                </p>
+                <button class="btn btn-danger" onclick="clearAllData()">
+                  🗑️ ล้างข้อมูลทั้งหมด
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/settings.js"></script>
+  <script>
+    function handleImportFile(input) {
+      if (input.files && input.files[0]) {
+        importData(input.files[0]);
+      }
+    }
+  </script>
+</body>
+</html>

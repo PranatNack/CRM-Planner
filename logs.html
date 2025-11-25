@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>บันทึกกิจกรรม - BIGIT CRM</title>
+  <link rel="icon" type="image/png" href="https://crm.bigitcorp.co.th/images/logo-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Header -->
+    <header class="header"></header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        <!-- Page Header -->
+        <div style="margin-bottom: var(--spacing-xl); display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--spacing-md);">
+          <div>
+            <h1>บันทึกกิจกรรม</h1>
+            <p class="text-muted">ติดตามและ Export บันทึกการทำงานทั้งหมด</p>
+          </div>
+          
+          <div style="display: flex; gap: var(--spacing-sm); flex-wrap: wrap;">
+            <button class="btn btn-outline" onclick="exportLogs('csv')">
+              📊 Export CSV
+            </button>
+            <button class="btn btn-outline" onclick="exportLogs('excel')">
+              📈 Export Excel
+            </button>
+            <button class="btn btn-outline" onclick="exportLogs('json')">
+              📋 Export JSON
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div style="margin-bottom: var(--spacing-xl); display: flex; gap: var(--spacing-sm); flex-wrap: wrap;">
+          <button class="btn btn-primary filter-btn" data-filter="all" onclick="renderLogs('all')">
+            📝 ทั้งหมด
+          </button>
+          <button class="btn btn-outline filter-btn" data-filter="auth" onclick="renderLogs('auth')">
+            🔐 การเข้าสู่ระบบ
+          </button>
+          <button class="btn btn-outline filter-btn" data-filter="task" onclick="renderLogs('task')">
+            📋 งาน
+          </button>
+          <button class="btn btn-outline filter-btn" data-filter="project" onclick="renderLogs('project')">
+            📁 โปรเจกต์
+          </button>
+          <button class="btn btn-outline filter-btn" data-filter="comment" onclick="renderLogs('comment')">
+            💬 ความคิดเห็น
+          </button>
+          <button class="btn btn-outline filter-btn" data-filter="checklist" onclick="renderLogs('checklist')">
+            ☑️ รายการตรวจสอบ
+          </button>
+          <button class="btn btn-outline filter-btn" data-filter="notification" onclick="renderLogs('notification')">
+            🔔 การแจ้งเตือน
+          </button>
+          <button class="btn btn-outline filter-btn" data-filter="settings" onclick="renderLogs('settings')">
+            ⚙️ การตั้งค่า
+          </button>
+        </div>
+
+        <!-- Logs Container -->
+        <div id="logsContainer"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/logs.js"></script>
+</body>
+</html>

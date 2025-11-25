@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>จัดการโปรเจกต์ - BIGIT CRM</title>
+  <link rel="icon" type="image/png" href="https://crm.bigitcorp.co.th/images/logo-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Header -->
+    <header class="header"></header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        <!-- Page Header -->
+        <div style="margin-bottom: var(--spacing-xl);">
+          <h1>📋 จัดการโปรเจกต์</h1>
+          <p class="text-muted">จัดการและติดตามโปรเจกต์ทั้งหมด</p>
+        </div>
+
+        <!-- Projects Table -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">รายการโปรเจกต์</h3>
+            <button class="btn btn-primary" onclick="openCreateProjectModal()">
+              ➕ สร้างโปรเจกต์ใหม่
+            </button>
+          </div>
+          
+          <!-- Search and Sort Controls -->
+          <div style="padding: var(--spacing-lg); border-bottom: 1px solid var(--color-gray-200); background: var(--color-gray-50);">
+            <div style="display: flex; gap: var(--spacing-md); align-items: center; flex-wrap: wrap;">
+              <!-- Search -->
+              <div style="flex: 1; min-width: 250px;">
+                <div style="position: relative;">
+                  <input 
+                    type="text" 
+                    id="projectSearchInput" 
+                    class="form-control" 
+                    placeholder="🔍 ค้นหาโปรเจกต์ (ชื่อ, เลขที่สัญญา, ผู้จัดการ...)"
+                    oninput="filterAndSortProjects()"
+                    style="padding-right: 40px;">
+                  <button 
+                    onclick="clearSearch()"
+                    style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--color-gray-400); display: none;"
+                    id="clearSearchBtn">
+                    ✕
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Sort Controls -->
+              <div style="display: flex; gap: var(--spacing-sm); align-items: center;">
+                <label style="font-weight: 500; white-space: nowrap;">เรียงตาม:</label>
+                <select 
+                  id="projectSortSelect" 
+                  class="form-control" 
+                  onchange="filterAndSortProjects()"
+                  style="min-width: 150px;">
+                  <option value="newest">ล่าสุด (Newest)</option>
+                  <option value="oldest">เก่าสุด (Oldest)</option>
+                  <option value="name-asc">ชื่อ A-Z</option>
+                  <option value="name-desc">ชื่อ Z-A</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-body" style="padding: 0;">
+            <div class="table-wrapper" style="border: none; border-radius: 0;">
+              <table class="table" style="border-collapse: collapse; margin: 0;">
+                <thead>
+                  <tr style="background: var(--color-gray-100); border-bottom: 2px solid var(--color-gray-300);">
+                    <th onclick="sortByColumn('name')" style="padding: var(--spacing-md); border: 1px solid var(--color-gray-200); text-align: left; font-weight: 600; cursor: pointer; user-select: none;" title="คลิกเพื่อเรียงลำดับ">
+                      ชื่อโปรเจกต์ <span id="sort-name"></span>
+                    </th>
+                    <th onclick="sortByColumn('contract')" style="padding: var(--spacing-md); border: 1px solid var(--color-gray-200); text-align: center; font-weight: 600; cursor: pointer; user-select: none;" title="คลิกเพื่อเรียงลำดับ">
+                      เลขที่สัญญา <span id="sort-contract"></span>
+                    </th>
+                    <th onclick="sortByColumn('fiscal')" style="padding: var(--spacing-md); border: 1px solid var(--color-gray-200); text-align: center; font-weight: 600; cursor: pointer; user-select: none;" title="คลิกเพื่อเรียงลำดับ">
+                      ปีงบประมาณ <span id="sort-fiscal"></span>
+                    </th>
+                    <th onclick="sortByColumn('startDate')" style="padding: var(--spacing-md); border: 1px solid var(--color-gray-200); text-align: center; font-weight: 600; cursor: pointer; user-select: none;" title="คลิกเพื่อเรียงลำดับ">
+                      วันเริ่มโปรเจกต์ <span id="sort-startDate"></span>
+                    </th>
+                    <th onclick="sortByColumn('endDate')" style="padding: var(--spacing-md); border: 1px solid var(--color-gray-200); text-align: center; font-weight: 600; cursor: pointer; user-select: none;" title="คลิกเพื่อเรียงลำดับ">
+                      วันสิ้นสุดสัญญา <span id="sort-endDate"></span>
+                    </th>
+                    <th onclick="sortByColumn('manager')" style="padding: var(--spacing-md); border: 1px solid var(--color-gray-200); text-align: center; font-weight: 600; cursor: pointer; user-select: none;" title="คลิกเพื่อเรียงลำดับ">
+                      ผู้จัดการ <span id="sort-manager"></span>
+                    </th>
+                    <th style="padding: var(--spacing-md); border: 1px solid var(--color-gray-200); text-align: center; font-weight: 600; min-width: 150px;">
+                      สถานะ
+                    </th>
+                    <th onclick="sortByColumn('taskCount')" style="padding: var(--spacing-md); border: 1px solid var(--color-gray-200); text-align: center; font-weight: 600; cursor: pointer; user-select: none;" title="คลิกเพื่อเรียงลำดับ">
+                      จำนวนงาน <span id="sort-taskCount"></span>
+                    </th>
+                    <th style="padding: var(--spacing-md); border: 1px solid var(--color-gray-200); text-align: center; font-weight: 600;">
+                      รายละเอียด
+                    </th>
+                    <th style="padding: var(--spacing-md); border: 1px solid var(--color-gray-200); text-align: center; font-weight: 600; min-width: 140px;">
+                      จัดการ
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="projectsTableBody">
+                  <!-- Projects will be rendered here by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Project Modal -->
+  <div class="modal" id="projectModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="projectModalTitle">สร้างโปรเจกต์ใหม่</h2>
+        <button class="modal-close" onclick="closeModal('projectModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="projectForm">
+          <div class="form-group">
+            <label class="form-label">ชื่อโปรเจกต์ *</label>
+            <input type="text" class="form-control" id="projectName" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">รายละเอียด</label>
+            <textarea class="form-control" id="projectDescription" rows="3"></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+            <div class="form-group">
+              <label class="form-label">เลขที่สัญญา</label>
+              <input type="text" class="form-control" id="projectContractNumber" placeholder="CNT-2025-001">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ปีงบประมาณ (พ.ศ.)</label>
+              <input type="text" class="form-control" id="projectFiscalYear" placeholder="2568">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+            <div class="form-group">
+              <label class="form-label">วันเริ่มโปรเจกต์</label>
+              <input type="date" class="form-control" id="projectStartDate">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">วันสิ้นสุดสัญญา</label>
+              <input type="date" class="form-control" id="projectExpirationDate">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">สถานะ</label>
+            <select class="form-control" id="projectStatus">
+              <option value="todo">ยังไม่เริ่ม</option>
+              <option value="inprogress" selected>ดำเนินการ</option>
+              <option value="done">เสร็จสิ้น</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+            <div class="form-group">
+              <label class="form-label">เจ้าของโปรเจกต์</label>
+              <select class="form-control" id="projectOwner"></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">ผู้จัดการโปรเจกต์</label>
+              <select class="form-control" id="projectManager"></select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('projectModal')">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="saveProject()">💾 บันทึก</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/tasks.js"></script>
+  <script src="assets/js/projects.js"></script>
+</body>
+</html>

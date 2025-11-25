@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายละเอียดงาน - BIGIT CRM</title>
+  <link rel="icon" type="image/png" href="https://crm.bigitcorp.co.th/images/logo-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Header -->
+    <header class="header"></header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        <!-- Back Button -->
+        <div style="margin-bottom: var(--spacing-lg);">
+          <a href="tasks.html" class="btn btn-outline">← กลับไปหน้างานทั้งหมด</a>
+        </div>
+
+        <div id="taskDetailContainer"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Checklist Modal -->
+  <div class="modal" id="checklistModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">เพิ่มรายการตรวจสอบ</h2>
+        <button class="modal-close" onclick="closeModal('checklistModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">รายการ</label>
+          <input type="text" class="form-control" id="checklistItemText" placeholder="ระบุรายการที่ต้องทำ">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('checklistModal')">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="saveChecklistItem()">เพิ่ม</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reminder Modal -->
+  <div class="modal" id="reminderModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">ตั้งการแจ้งเตือน</h2>
+        <button class="modal-close" onclick="closeModal('reminderModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">วันที่แจ้งเตือน</label>
+          <input type="date" class="form-control" id="reminderDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ข้อความ (ไม่บังคับ)</label>
+          <textarea class="form-control" id="reminderMessage" rows="3" placeholder="ข้อความที่ต้องการแจ้งเตือน"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('reminderModal')">ยกเลิก</button>
+        <button class="btn btn-primary" onclick="saveReminder()">ตั้งการแจ้งเตือน</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/projects.js"></script>
+  <script src="assets/js/tasks.js"></script>
+  <script src="assets/js/notifications.js"></script>
+  <script>
+    let currentTaskId = null;
+
+    // Initialize
+    function initTaskDetail() {
+      const urlParams = new URLSearchParams(window.location.search);
+      currentTaskId = urlParams.get('id');
+
+      if (!currentTaskId) {
+        window.location.href = 'tasks.html';
+        return;
+      }
+
+      renderTaskDetail();
+    }
+
+    function renderTaskDetail() {
+      const task = getTaskById(currentTaskId);
+      
+      if (!task) {
+        document.getElementById('taskDetailContainer').innerHTML = `
+          <div class="card">
+            <div class="card-body text-center">
+              <h2>ไม่พบงาน</h2>
+              <p class="text-muted">งานที่คุณค้นหาไม่มีอยู่ในระบบ</p>
+              <a href="tasks.html" class="btn btn-primary">กลับไปหน้างานทั้งหมด</a>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const project = task.projectId ? getProjectById(task.projectId) : null;
+      const assignee = task.assignee ? getUserById(task.assignee) : null;
+      const manager = task.manager ? getUserById(task.manager) : null;
+
+      const statusBadges = {
+        todo: '<span class="badge badge-todo">ต้องทำ</span>',
+        inprogress: '<span class="badge badge-inprogress">กำลังทำ</span>',
+        done: '<span class="badge badge-done">เสร็จแล้ว</span>'
+      };
+
+      const priorityBadges = {
+        low: '<span class="badge badge-priority-low">ต่ำ</span>',
+        medium: '<span class="badge badge-priority-medium">ปานกลาง</span>',
+        high: '<span class="badge badge-priority-high">สูง</span>'
+      };
+
+      const completedChecklist = task.checklist.filter(i => i.completed).length;
+      const totalChecklist = task.checklist.length;
+
+      document.getElementById('taskDetailContainer').innerHTML = `
+        <!-- Task Info Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div style="flex: 1;">
+                <h2 class="card-title">${task.title}</h2>
+                <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm);">
+                  ${statusBadges[task.status]}
+                  ${priorityBadges[task.priority]}
+                </div>
+              </div>
+              <div style="display: flex; gap: var(--spacing-sm);">
+                <button class="btn btn-primary" onclick="openEditTaskModal('${task.id}')">✏️ แก้ไข</button>
+                <button class="btn btn-outline" onclick="openReminderModal()">🔔 ตั้งเตือน</button>
+                <button class="btn btn-danger" onclick="confirmDeleteTask('${task.id}')">🗑️ ลบ</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+              ${project ? `
+                <div>
+                  <div class="text-muted" style="font-size: 0.875rem; margin-bottom: var(--spacing-xs);">📁 โปรเจกต์</div>
+                  <div><strong>${project.name}</strong></div>
+                </div>
+              ` : ''}
+              ${assignee ? `
+                <div>
+                  <div class="text-muted" style="font-size: 0.875rem; margin-bottom: var(--spacing-xs);">👤 ผู้รับผิดชอบ</div>
+                  <div><strong>${assignee.name}</strong></div>
+                </div>
+              ` : ''}
+              ${manager ? `
+                <div>
+                  <div class="text-muted" style="font-size: 0.875rem; margin-bottom: var(--spacing-xs);">👔 ผู้จัดการ</div>
+                  <div><strong>${manager.name}</strong></div>
+                </div>
+              ` : ''}
+              ${task.dueDate ? `
+                <div>
+                  <div class="text-muted" style="font-size: 0.875rem; margin-bottom: var(--spacing-xs);">📅 กำหนดส่ง</div>
+                  <div><strong>${formatDate(task.dueDate)}</strong></div>
+                </div>
+              ` : ''}
+              <div>
+                <div class="text-muted" style="font-size: 0.875rem; margin-bottom: var(--spacing-xs);">📝 สร้างเมื่อ</div>
+                <div><strong>${formatDate(task.createdAt)}</strong></div>
+              </div>
+            </div>
+
+            ${task.description ? `
+              <div>
+                <h3 style="font-size: 1.125rem; margin-bottom: var(--spacing-md);">📄 รายละเอียด</h3>
+                <p style="white-space: pre-wrap; line-height: 1.6;">${task.description}</p>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- Checklist Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h3 class="card-title">
+                ☑️ รายการตรวจสอบ
+                ${totalChecklist > 0 ? `<span class="badge badge-${completedChecklist === totalChecklist ? 'done' : 'inprogress'}">${completedChecklist}/${totalChecklist}</span>` : ''}
+              </h3>
+              <button class="btn btn-sm btn-primary" onclick="openChecklistModal()">➕ เพิ่มรายการ</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="checklistContainer">
+              ${task.checklist.length === 0 ? '<p class="text-muted text-center">ยังไม่มีรายการตรวจสอบ</p>' : renderChecklist(task)}
+            </div>
+          </div>
+        </div>
+
+        <!-- Comments Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <h3 class="card-title">💬 ความคิดเห็น</h3>
+          </div>
+          <div class="card-body">
+            <div id="commentsContainer">
+              ${renderComments(task)}
+            </div>
+            <div style="margin-top: var(--spacing-lg); display: flex; gap: var(--spacing-sm);">
+              <input type="text" class="form-control" id="newComment" placeholder="เพิ่มความคิดเห็น...">
+              <button class="btn btn-primary" onclick="addComment()">ส่ง</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Timeline Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📜 กิจกรรม</h3>
+          </div>
+          <div class="card-body">
+            ${renderTaskTimeline(task)}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderChecklist(task) {
+      if (!task.checklist || task.checklist.length === 0) {
+        return '<p class="text-muted text-center">ยังไม่มีรายการตรวจสอบ</p>';
+      }
+
+      return `
+        <div class="checklist">
+          ${task.checklist.map(item => `
+            <div class="checklist-item">
+              <input 
+                type="checkbox" 
+                class="checklist-checkbox"
+                ${item.completed ? 'checked' : ''}
+                onchange="toggleChecklistItem('${task.id}', '${item.id}')"
+              >
+              <div class="checklist-content">
+                <div class="checklist-text ${item.completed ? 'completed' : ''}" id="checklist-text-${item.id}">
+                  ${item.text}
+                </div>
+                <div style="margin-top: var(--spacing-sm); display: flex; gap: var(--spacing-sm);">
+                  <button class="btn btn-sm btn-outline" onclick="editChecklistItem('${item.id}')">แก้ไข</button>
+                  <button class="btn btn-sm btn-outline" onclick="toggleChecklistComments('${item.id}')">💬 ความคิดเห็น (${item.comments?.length || 0})</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteChecklistItemConfirm('${task.id}', '${item.id}')">ลบ</button>
+                </div>
+                <div class="checklist-comments" id="checklist-comments-${item.id}" style="display: none;">
+                  ${renderChecklistComments(item)}
+                  <div style="margin-top: var(--spacing-sm); display: flex; gap: var(--spacing-sm);">
+                    <input type="text" class="form-control" id="checklist-comment-${item.id}" placeholder="เพิ่มความคิดเห็น...">
+                    <button class="btn btn-sm btn-primary" onclick="addChecklistCommentBtn('${task.id}', '${item.id}')">ส่ง</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderChecklistComments(item) {
+      if (!item.comments || item.comments.length === 0) {
+        return '<p class="text-muted" style="font-size: 0.875rem;">ยังไม่มีความคิดเห็น</p>';
+      }
+
+      return item.comments.map(comment => `
+        <div class="comment">
+          <div class="comment-author">${comment.userName}</div>
+          <div class="comment-text">${comment.text}</div>
+          <div class="comment-time">${formatRelativeTime(comment.createdAt)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderComments(task) {
+      if (!task.comments || task.comments.length === 0) {
+        return '<p class="text-muted text-center">ยังไม่มีความคิดเห็น</p>';
+      }
+
+      return task.comments.map(comment => `
+        <div class="comment" style="margin-bottom: var(--spacing-md);">
+          <div class="comment-author">${comment.userName}</div>
+          <div class="comment-text">${comment.text}</div>
+          <div class="comment-time">${formatRelativeTime(comment.createdAt)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderTaskTimeline(task) {
+      const logs = getLogs().filter(log => log.metadata?.taskId === task.id);
+
+      if (logs.length === 0) {
+        return '<p class="text-muted text-center">ยังไม่มีกิจกรรม</p>';
+      }
+
+      return `
+        <div class="timeline">
+          ${logs.map(log => `
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <div class="timeline-title">${log.action}</div>
+                <div class="timeline-description">${log.description}</div>
+                <div class="timeline-time">${formatRelativeTime(log.timestamp)}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // Checklist functions
+    function openChecklistModal() {
+      document.getElementById('checklistItemText').value = '';
+      openModal('checklistModal');
+    }
+
+    function saveChecklistItem() {
+      const itemText = document.getElementById('checklistItemText').value.trim();
+      
+      if (!itemText) {
+        showToast('กรุณาระบุรายการ', 'error');
+        return;
+      }
+
+      addChecklistItem(currentTaskId, itemText);
+      closeModal('checklistModal');
+      renderTaskDetail();
+      showToast('เพิ่มรายการเรียบร้อย', 'success');
+    }
+
+    function toggleChecklistItemFn(taskId, itemId) {
+      toggleChecklistItem(taskId, itemId);
+      renderTaskDetail();
+    }
+
+    function editChecklistItem(itemId) {
+      const textElement = document.getElementById(`checklist-text-${itemId}`);
+      const currentText = textElement.textContent.trim();
+      
+      const newText = prompt('แก้ไขรายการ:', currentText);
+      
+      if (newText && newText !== currentText) {
+        updateChecklistItem(currentTaskId, itemId, newText);
+        renderTaskDetail();
+        showToast('แก้ไขรายการเรียบร้อย', 'success');
+      }
+    }
+
+    function deleteChecklistItemConfirm(taskId, itemId) {
+      if (confirm('คุณแน่ใจหรือไม่ที่จะลบรายการนี้?')) {
+        deleteChecklistItem(taskId, itemId);
+        renderTaskDetail();
+        showToast('ลบรายการเรียบร้อย', 'success');
+      }
+    }
+
+    function toggleChecklistComments(itemId) {
+      const commentsDiv = document.getElementById(`checklist-comments-${itemId}`);
+      commentsDiv.style.display = commentsDiv.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function addChecklistCommentBtn(taskId, itemId) {
+      const input = document.getElementById(`checklist-comment-${itemId}`);
+      const commentText = input.value.trim();
+      
+      if (!commentText) {
+        showToast('กรุณาระบุความคิดเห็น', 'error');
+        return;
+      }
+
+      addChecklistComment(taskId, itemId, commentText);
+      input.value = '';
+      renderTaskDetail();
+      showToast('เพิ่มความคิดเห็นเรียบร้อย', 'success');
+    }
+
+    // Comment functions
+    function addComment() {
+      const input = document.getElementById('newComment');
+      const commentText = input.value.trim();
+      
+      if (!commentText) {
+        showToast('กรุณาระบุความคิดเห็น', 'error');
+        return;
+      }
+
+      addTaskComment(currentTaskId, commentText);
+      input.value = '';
+      renderTaskDetail();
+      showToast('เพิ่มความคิดเห็นเรียบร้อย', 'success');
+    }
+
+    // Reminder functions
+    function openReminderModal() {
+      const task = getTaskById(currentTaskId);
+      if (task.dueDate) {
+        document.getElementById('reminderDate').value = task.dueDate;
+      }
+      openModal('reminderModal');
+    }
+
+    function saveReminder() {
+      const reminderDate = document.getElementById('reminderDate').value;
+      const reminderMessage = document.getElementById('reminderMessage').value.trim();
+      
+      if (!reminderDate) {
+        showToast('กรุณาระบุวันที่แจ้งเตือน', 'error');
+        return;
+      }
+
+      createReminder(currentTaskId, reminderDate, reminderMessage);
+      closeModal('reminderModal');
+    }
+
+    // Initialize
+    initTaskDetail();
+  </script>
+</body>
+</html>

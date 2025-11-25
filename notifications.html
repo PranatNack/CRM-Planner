@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>การแจ้งเตือน - BIGIT CRM</title>
+  <link rel="icon" type="image/png" href="https://crm.bigitcorp.co.th/images/logo-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Header -->
+    <header class="header"></header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        <!-- Page Header -->
+        <div style="margin-bottom: var(--spacing-xl);">
+          <h1>การแจ้งเตือน</h1>
+          <p class="text-muted">จัดการการแจ้งเตือนและข้อความทั้งหมด</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <ul class="tabs-nav">
+            <li>
+              <a href="#" class="tab-link active" data-tab="inbox" onclick="switchTab('inbox'); return false;">
+                📥 กล่องข้อความ
+              </a>
+            </li>
+            <li>
+              <a href="#" class="tab-link" data-tab="trash" onclick="switchTab('trash'); return false;">
+                🗑️ ถังขยะ
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Inbox Tab -->
+        <div class="tab-content active" id="inboxTab">
+          <div id="inboxNotifications"></div>
+        </div>
+
+        <!-- Trash Tab -->
+        <div class="tab-content" id="trashTab">
+          <div id="trashNotifications"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/notifications.js"></script>
+  <script src="assets/js/tasks.js"></script>
+</body>
+</html>
